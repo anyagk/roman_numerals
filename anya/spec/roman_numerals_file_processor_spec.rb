@@ -1,4 +1,4 @@
-require_relative 'roman_numerals_file_processor'
+require_relative '../roman_numerals_file_processor'
 
 describe RomanNumeralsFileProcessor do
   describe '#convert_body' do

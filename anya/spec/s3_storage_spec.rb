@@ -1,4 +1,4 @@
-require_relative 's3_storage'
+require_relative '../s3_storage'
 
 describe S3Storage do
   let(:storage) { double('storage', directories: directories) }

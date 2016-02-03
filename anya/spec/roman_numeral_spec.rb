@@ -1,4 +1,4 @@
-require_relative 'roman_numeral'
+require_relative '../roman_numeral'
 
 describe RomanNumeral do
  describe '#int_value' do
