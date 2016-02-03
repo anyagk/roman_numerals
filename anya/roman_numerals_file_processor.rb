@@ -1,47 +1,21 @@
+require_relative 'roman_numeral'
+require_relative 's3_storage'
+
 class RomanNumeralsFileProcessor
-
-  def initialize(directory_name)
-    @directory_name = directory_name
-  end
-
-  def download_from_s3(file)
-    directory.files.get(file) if directory
-  end
-
-  def process_body(file)
-   file = download_from_s3(file)
-   result = convert_body(file.body)
-   upload_to_s3(result)
+  def self.process_s3_file(directory, file)
+    s3_storage = S3Storage.new(directory)
+    downloaded_file = s3_storage.download(file)
+    result = RomanNumeralsFileProcessor.new.convert_body(downloaded_file.body)
+    s3_storage.upload(file, result)
   end
 
   def convert_body(body)
-    number = []
+    numbers  = []
     body.each_line do |line|
-      roman_number = RomanNumeral.new(line)
+      roman_number = RomanNumeral.new(line.strip)
       numbers << roman_number.int_value
     end
-    number
-  end
-
-  def storage
-    @storage ||= Fog::Storage.new({
-      provider: 'AWS',
-      aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
-      aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY']
-    })
-  end
-
-  def directory
-    @directory ||= storage.directories.get @directory_name
-  end
-
-  def upload_to_s3(file_name, numbers)
-    directory.files.create({
-      key: "Anya/#{file_name}_converted_#{Time.now.strftime("%H:%M:%S-%m-%d-%Y")}",
-      body: numbers.join("\n"),
-      public: false
-    })
+    numbers
   end
 end
-
 
